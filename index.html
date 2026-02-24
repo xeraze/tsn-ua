@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ТСН.ua — Телевізійна служба новин №1</title>
+    <title>ТСН.ua — Новини України та світу</title>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -13,12 +13,12 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1a1a1a; margin: 0; }
         .tsn-logo { font-weight: 1000; letter-spacing: -0.05em; }
         .animate-live { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+        .prose p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; color: #374151; }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -27,115 +27,179 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // ============================================================
-        // ИНСТРУКЦИЯ ПО ЗАМЕНЕ НОВОСТЕЙ:
-        // 1. Находите объект 'mainHeadline' — это большая новость сверху.
-        // 2. Находите массив 'news' — это список всех остальных новостей.
-        // 3. Просто меняйте текст в кавычках (title, desc, cat).
-        // 4. Чтобы добавить новую новость в список, добавьте новый объект { id: ... } в начало массива 'news'.
-        // ============================================================
-        
-        const INITIAL_DATA = {
-            mainHeadline: {
-                id: 'main-1',
-                category: 'Ексклюзив',
-                title: 'П’ятий рік повномасштабної війни: чи стане він останнім — два сценарії',
-                desc: 'Військові експерти та аналітики ТСН розібрали ключові фактори, що вплинуть на хід бойових дій у 2025 році.',
+        // --- БАЗА ДАНИХ (Редагуй тут) ---
+        const DATABASE = {
+            mainStory: {
+                id: '3028130',
+                category: 'Україна',
+                title: 'П’ятий рік повномасштабної війни: чи стане він останнім — два основних сценарії',
+                desc: 'Військові експерти розібрали ключові фактори, що вплинуть на хід бойових дій у 2025 році. Чи готова Росія до тривалого виснаження?',
+                fullText: [
+                    "Війна в Україні триває вже п'ятий рік, і аналітики починають ставити питання про можливі терміни її завершення. Наразі виділяють два основних сценарії розвитку подій.",
+                    "Перший сценарій передбачає продовження війни на виснаження, де ключову роль відіграватиме стабільність західної допомоги та здатність України мобілізувати внутрішні ресурси.",
+                    "Другий сценарій розглядає можливість дипломатичного тиску та зміни внутрішньої ситуації в РФ, що може призвести до замороження конфлікту за корейським варіантом.",
+                    "Експерти наголошують, що 2025 рік стане вирішальним для логістики та виробництва зброї обома сторонами."
+                ],
                 img: 'https://img.tsn.ua/cached/853/tsn-1284f5ef/thumbs/1920x600/b3/53/78727e29b1e58f5e120be37a52dd53b3.jpeg'
             },
             news: [
-                { id: 10, time: '16:15', cat: 'Херсон', title: 'ОНОВЛЕНО: Ситуація в Антонівці стабілізована, але обстріли тривають' },
-                { id: 9, time: '15:45', cat: 'Війна', title: 'Генштаб повідомив про успішне відбиття атак на Півдні' },
-                { id: 8, time: '15:20', cat: 'Економіка', title: 'Курс валют: Долар демонструє стабільність перед вихідними' },
-                { id: 7, time: '14:50', cat: 'Світ', title: 'Німеччина передала новий пакет ППО для захисту українського неба' },
-                { id: 6, time: '14:10', cat: 'Політика', title: 'Зеленський анонсував нові реформи в оборонному секторі' },
-                { id: 5, time: '13:30', cat: 'Херсон', title: 'Волонтери доставили гуманітарну допомогу у прифронтові села' }
+                { id: 1, time: '13:00', cat: 'Херсон', title: 'Окупанти обстріляли центр міста: є постраждалі' },
+                { id: 2, time: '12:55', cat: 'Політика', title: 'Верховна Рада прийняла новий закон про підтримку ветеранів' },
+                { id: 3, time: '11:20', cat: 'Світ', title: 'Байден зробив заяву щодо подальшої підтримки України' },
+                { id: 4, time: '10:45', cat: 'Економіка', title: 'Ціни на пальне знову поповзли вгору: чого очікувати водіям' },
+                { id: 5, time: '9:10', cat: 'Здоров’я', title: 'Новий штам вірусу зафіксовано в Європі: поради лікарів' },
+                { id: 6, time: '8:30', cat: 'Спорт', title: 'Збірна України готується до вирішального матчу' },
+                { id: 7, time: '7:50', cat: 'Наука', title: 'Українські розробники створили новий дрон-камікадзе' },
+                { id: 8, time: '6:20', cat: 'Шоу-біз', title: 'Відома співачка оголосила про благодійний тур містами Європи' }
             ]
         };
-
-        // --- ВСЕ ЧТО НИЖЕ, ТРОГАТЬ НЕ НУЖНО (Логика отображения) ---
 
         const Icon = ({ name, size = 18, className = "" }) => (
             <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>
         );
 
-        const App = () => {
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, []);
+        // --- ГОЛОВНА СТОРІНКА ---
+        const HomePage = ({ onOpenArticle }) => (
+            <div className="space-y-12">
+                {/* Головний банер */}
+                <section 
+                    className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl"
+                    onClick={() => onOpenArticle(DATABASE.mainStory)}
+                >
+                    <img src={DATABASE.mainStory.img} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent p-8 md:p-14 flex flex-col justify-end">
+                        <span className="bg-red-600 text-white text-[10px] font-black uppercase px-4 py-1.5 mb-6 w-fit shadow-xl">
+                            {DATABASE.mainStory.category}
+                        </span>
+                        <h1 className="text-white text-3xl md:text-5xl font-black leading-tight mb-4 group-hover:underline decoration-red-600 decoration-4 underline-offset-8">
+                            {DATABASE.mainStory.title}
+                        </h1>
+                        <p className="text-gray-300 text-lg max-w-3xl line-clamp-2">{DATABASE.mainStory.desc}</p>
+                    </div>
+                </section>
 
-            return (
-                <div className="min-h-screen flex flex-col">
-                    <header className="bg-white border-b-8 border-red-600 sticky top-0 z-50 shadow-sm">
-                        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-                            <div className="flex items-baseline cursor-pointer">
-                                <span className="text-4xl tsn-logo uppercase">ТСН</span>
-                                <span className="text-red-600 text-5xl">.</span>
-                                <span className="text-xs font-black text-gray-400 ml-1 uppercase underline decoration-red-600 decoration-2">UA</span>
-                            </div>
-                            <nav className="hidden md:flex gap-6">
-                                {['Головна', 'Відео', 'Політика', 'Світ', 'Херсон'].map(i => (
-                                    <span key={i} className="text-[10px] font-black uppercase tracking-tighter text-gray-500 hover:text-red-600 cursor-pointer">{i}</span>
-                                ))}
-                            </nav>
-                            <div className="flex items-center gap-4">
-                                <div className="bg-red-600 text-white px-3 py-1 rounded font-black text-[10px] animate-live flex items-center gap-1">
-                                    <Icon name="radio" size={12} /> LIVE
-                                </div>
-                                <Icon name="search" className="text-gray-400" />
-                            </div>
-                        </div>
-                    </header>
-
-                    <main className="max-w-7xl mx-auto w-full px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        <div className="lg:col-span-8 space-y-8">
-                            {/* Главная новость */}
-                            <div className="relative h-[500px] rounded-[2rem] overflow-hidden group shadow-2xl">
-                                <img src={INITIAL_DATA.mainHeadline.img} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent p-10 flex flex-col justify-end">
-                                    <span className="bg-red-600 text-white text-[10px] font-black uppercase px-3 py-1 mb-4 w-fit">{INITIAL_DATA.mainHeadline.category}</span>
-                                    <h1 className="text-white text-4xl md:text-5xl font-black leading-tight mb-4">{INITIAL_DATA.mainHeadline.title}</h1>
-                                    <p className="text-gray-300 text-lg max-w-2xl">{INITIAL_DATA.mainHeadline.desc}</p>
-                                </div>
-                            </div>
-
-                            {/* Сетка малых новостей */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {INITIAL_DATA.news.slice(0, 4).map(item => (
-                                    <div key={item.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all cursor-pointer">
-                                        <div className="flex justify-between items-start mb-3">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    {/* Список новин з фото */}
+                    <div className="lg:col-span-8 space-y-10">
+                        <h2 className="text-2xl font-black uppercase border-l-8 border-red-600 pl-4 mb-8">Останні новини</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {DATABASE.news.map(item => (
+                                <div key={item.id} className="bg-white p-2 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl transition-all cursor-pointer group">
+                                    <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden mb-4">
+                                        <img src={`https://picsum.photos/seed/${item.id + 10}/600/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="flex justify-between items-center mb-2">
                                             <span className="text-red-600 font-black text-[10px] uppercase">{item.cat}</span>
-                                            <span className="text-gray-300 font-bold text-[10px]">{item.time}</span>
+                                            <span className="text-gray-400 font-bold text-[10px]">{item.time}</span>
                                         </div>
                                         <h3 className="font-bold text-lg leading-tight group-hover:text-red-600">{item.title}</h3>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Права стрічка новин */}
+                    <aside className="lg:col-span-4 space-y-6">
+                        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 sticky top-24">
+                            <h2 className="font-black uppercase text-sm mb-6 flex items-center gap-2 border-b pb-4">
+                                <span className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></span> Тільки що
+                            </h2>
+                            <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                {DATABASE.news.map(item => (
+                                    <div key={item.id} className="border-b border-gray-50 pb-4 last:border-0 cursor-pointer group">
+                                        <div className="flex gap-2 text-[10px] mb-1 font-bold">
+                                            <span className="text-red-600">{item.time}</span>
+                                            <span className="text-gray-400 uppercase">{item.cat}</span>
+                                        </div>
+                                        <p className="text-sm font-bold group-hover:text-red-600 transition-colors leading-snug">{item.title}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
+                    </aside>
+                </div>
+            </div>
+        );
 
-                        {/* Сайдбар (Стрічка) */}
-                        <div className="lg:col-span-4">
-                            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                                <h2 className="font-black uppercase text-sm mb-6 flex items-center gap-2">
-                                    <span className="w-3 h-3 bg-red-600 rounded-full"></span> Стрічка новин
-                                </h2>
-                                <div className="space-y-6 max-h-[700px] overflow-y-auto custom-scrollbar pr-2">
-                                    {INITIAL_DATA.news.map(item => (
-                                        <div key={item.id} className="border-b border-gray-50 pb-4 last:border-0 cursor-pointer group">
-                                            <div className="flex gap-2 text-[10px] mb-1 font-bold">
-                                                <span className="text-red-600">{item.time}</span>
-                                                <span className="text-gray-400 uppercase">{item.cat}</span>
-                                            </div>
-                                            <p className="text-sm font-bold group-hover:text-red-600 transition-colors leading-snug">{item.title}</p>
-                                        </div>
-                                    ))}
+        // --- СТОРІНКА СТАТТІ ---
+        const ArticlePage = ({ article }) => (
+            <div className="max-w-4xl mx-auto py-8">
+                <nav className="mb-8 text-[11px] font-bold text-gray-400 uppercase flex gap-2">
+                    <span className="text-red-600">Головна</span> / <span>{article.category}</span>
+                </nav>
+                <h1 className="text-4xl md:text-6xl font-black leading-tight mb-8">{article.title}</h1>
+                <div className="flex items-center gap-4 mb-10 text-sm text-gray-500">
+                    <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-black">ТСН</div>
+                    <div>
+                        <p className="font-black text-black">Редакція ТСН.ua</p>
+                        <p>Сьогодні, 12:45</p>
+                    </div>
+                </div>
+                <img src={article.img} className="w-full h-auto rounded-[2.5rem] mb-12 shadow-xl" />
+                <div className="prose max-w-none">
+                    {article.fullText.map((p, i) => (
+                        <p key={i}>{p}</p>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // --- ГОЛОВНИЙ ДОДАТОК ---
+        const App = () => {
+            const [view, setView] = useState({ page: 'home', data: null });
+
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [view]);
+
+            const openArticle = (data) => {
+                setView({ page: 'article', data });
+                window.scrollTo(0, 0);
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col bg-[#f8f9fa]">
+                    <header className="bg-white border-b-8 border-red-600 sticky top-0 z-50 shadow-sm px-4">
+                        <div className="max-w-7xl mx-auto h-20 flex items-center justify-between">
+                            <div className="flex items-baseline cursor-pointer" onClick={() => setView({ page: 'home', data: null })}>
+                                <span className="text-4xl tsn-logo uppercase">ТСН</span>
+                                <span className="text-red-600 text-5xl">.</span>
+                                <span className="text-xs font-black text-gray-400 ml-1 uppercase">UA</span>
+                            </div>
+                            <nav className="hidden lg:flex gap-8">
+                                {['Головна', 'Війна', 'Херсон', 'Світ', 'Відео'].map(i => (
+                                    <span key={i} className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-red-600 cursor-pointer">{i}</span>
+                                ))}
+                            </nav>
+                            <div className="flex items-center gap-4">
+                                <div className="hidden sm:flex bg-red-600 text-white px-3 py-1 rounded font-black text-[10px] animate-live items-center gap-1">
+                                    <Icon name="radio" size={12} /> LIVE
                                 </div>
+                                <Icon name="search" className="text-gray-400 cursor-pointer hover:text-red-600" />
                             </div>
                         </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto w-full px-4 py-8">
+                        {view.page === 'home' ? (
+                            <HomePage onOpenArticle={openArticle} />
+                        ) : (
+                            <ArticlePage article={view.data} />
+                        )}
                     </main>
 
-                    <footer className="bg-black text-white p-12 mt-auto">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center opacity-50">
-                            <div className="text-2xl font-black italic">ТСН<span className="text-red-600">.</span>UA</div>
-                            <div className="text-[10px] font-bold uppercase tracking-widest mt-4 md:mt-0">© 2026 Всі права захищені</div>
+                    <footer className="bg-black text-white py-16 px-4 mt-20 border-t-8 border-red-600">
+                        <div className="max-w-7xl mx-auto flex flex-col items-center">
+                            <div className="text-4xl tsn-logo uppercase mb-8">ТСН<span className="text-red-600">.</span>UA</div>
+                            <div className="flex flex-wrap justify-center gap-8 mb-12 text-[10px] font-black uppercase text-gray-500">
+                                <span>Про проект</span>
+                                <span>Допомога</span>
+                                <span>Контакти</span>
+                                <span>Архів</span>
+                            </div>
+                            <p className="text-center text-[10px] text-gray-700 font-bold uppercase tracking-widest">
+                                © 2026 ТОВ «Телерадіокомпанія «Студія 1+1»
+                            </p>
                         </div>
                     </footer>
                 </div>

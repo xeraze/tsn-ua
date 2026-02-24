@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТСН | Новини Херсона та області</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --tsn-red: #e30613;
+            --tsn-dark: #1a1a1a;
+        }
+        body { background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .tsn-header { background-color: var(--tsn-dark); border-bottom: 4px solid var(--tsn-red); }
+        .tsn-logo { font-weight: 900; font-size: 2.5rem; color: white; letter-spacing: -2px; }
+        .tsn-red-text { color: var(--tsn-red); }
+        .news-card:hover img { transform: scale(1.05); transition: 0.3s; }
+        .category-badge { background-color: var(--tsn-red); color: white; padding: 2px 8px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Навігація -->
+    <header class="tsn-header sticky top-0 z-50 px-4 py-3 shadow-xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="tsn-logo">ТСН<span class="tsn-red-text">.</span>ua</div>
+            <nav class="hidden md:flex space-x-6 text-white font-semibold uppercase text-sm">
+                <a href="#" class="hover:text-red-500">Випуски</a>
+                <a href="#" class="hover:text-red-500 text-red-500">Херсон LIVE</a>
+                <a href="#" class="hover:text-red-500">Політика</a>
+                <a href="#" class="hover:text-red-500">Спецпроєкти</a>
+            </nav>
+            <div class="flex items-center space-x-4 text-white">
+                <i class="fas fa-search cursor-pointer hover:text-red-500"></i>
+                <div class="bg-red-600 px-3 py-1 rounded text-xs font-bold uppercase animate-pulse">Ефір</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Головна новина -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <div class="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-lg shadow-2xl bg-black">
+                <img src="https://images.unsplash.com/photo-1585829365234-781fdfc4130d?auto=format&fit=crop&q=80&w=1200" alt="Main News" class="w-full h-[500px] object-cover opacity-70 group-hover:opacity-100 transition duration-500">
+                <div class="absolute bottom-0 left-0 p-8 text-white w-full bg-gradient-to-t from-black to-transparent">
+                    <span class="category-badge mb-4 inline-block">Ексклюзив</span>
+                    <h1 class="text-4xl font-bold mb-4 leading-tight">П’ятий рік повномасштабної війни: чи стане він останнім? Два основних сценарії</h1>
+                    <p class="text-gray-200">Аналіз поточної ситуації на фронті та прогнози міжнародних експертів щодо майбутнього Херсонщини та всієї України.</p>
+                </div>
+            </div>
+
+            <!-- Стрічка новин -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-600">
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-clock text-red-600 mr-2"></i> Останні новини
+                </h3>
+                <div class="space-y-6">
+                    <div class="border-b pb-4 cursor-pointer hover:bg-gray-50 transition p-2 rounded">
+                        <span class="text-xs text-red-600 font-bold uppercase">12:45 • Політика</span>
+                        <p class="font-semibold text-gray-800 leading-snug">Прокурор Херсон оголосив про рейд проти НПУ</p>
+                    </div>
+                    <div class="border-b pb-4 cursor-pointer hover:bg-gray-50 transition p-2 rounded">
+                        <span class="text-xs text-red-600 font-bold uppercase">12:10 • Події</span>
+                        <p class="font-semibold text-gray-800 leading-snug">У центрі міста виявлено здетонований дрон з обломками: працюють вибухотехніки</p>
+                    </div>
+                    <div class="border-b pb-4 cursor-pointer hover:bg-gray-50 transition p-2 rounded">
+                        <span class="text-xs text-red-600 font-bold uppercase">11:30 • Економіка</span>
+                        <p class="font-semibold text-gray-800 leading-snug">Курс валют у Херсоні: як змінилися ціни на ринку</p>
+                    </div>
+                    <div class="pb-4 cursor-pointer hover:bg-gray-50 transition p-2 rounded">
+                        <span class="text-xs text-red-600 font-bold uppercase">10:15 • ТСН Гід</span>
+                        <p class="font-semibold text-gray-800 leading-snug">Де у Херсоні найсмачніша кава? Рейтинг ТСН</p>
+                    </div>
+                </div>
+                <button class="w-full mt-6 py-2 border-2 border-red-600 text-red-600 font-bold hover:bg-red-600 hover:text-white transition uppercase text-sm">Більше новин</button>
+            </div>
+        </section>
+
+        <!-- Відео блок -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 border-l-8 border-red-600 pl-4 uppercase">ТСН Випуски</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Картка відео -->
+                <div class="news-card bg-white rounded-lg shadow overflow-hidden cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&q=80&w=400" class="w-full h-48 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-play-circle text-white text-5xl opacity-80 shadow-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="font-bold text-sm line-clamp-2">ТСН. Тиждень: Підсумки найважливіших подій за останні 7 днів</p>
+                        <span class="text-xs text-gray-400 mt-2 block">24 лютого, 19:30</span>
+                    </div>
+                </div>
+                <!-- Додаткові картки -->
+                <div class="news-card bg-white rounded-lg shadow overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1541872703-74c5e443d1fe?auto=format&fit=crop&q=80&w=400" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <p class="font-bold text-sm line-clamp-2">Ситуація на кордоні: що кажуть військові кореспонденти ТСН</p>
+                        <span class="text-xs text-gray-400 mt-2 block">24 лютого, 12:00</span>
+                    </div>
+                </div>
+                <div class="news-card bg-white rounded-lg shadow overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&q=80&w=400" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <p class="font-bold text-sm line-clamp-2">Херсонщина відновлюється: нові будівлі та дороги</p>
+                        <span class="text-xs text-gray-400 mt-2 block">23 лютого, 15:45</span>
+                    </div>
+                </div>
+                <div class="news-card bg-white rounded-lg shadow overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=400" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <p class="font-bold text-sm line-clamp-2">Інтерв'ю з волонтерами: як працює тил</p>
+                        <span class="text-xs text-gray-400 mt-2 block">23 лютого, 09:10</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-zinc-900 text-white py-12 px-4 border-t-8 border-red-600">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="tsn-logo mb-4">ТСН<span class="tsn-red-text">.</span>ua</div>
+                <p class="text-gray-400 text-sm">Найбільший медіа-холдинг Херсона. Ми працюємо, щоб ви знали правду.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 uppercase">Підтримка</h4>
+                <ul class="text-gray-400 text-sm space-y-2">
+                    <li><a href="#" class="hover:text-red-500">Повідомити новину</a></li>
+                    <li><a href="#" class="hover:text-red-500">Вакансії ТСН</a></li>
+                    <li><a href="#" class="hover:text-red-500">Реклама на сайті</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 uppercase">Соціальні мережі</h4>
+                <div class="flex space-x-6 text-2xl">
+                    <a href="#" class="hover:text-blue-500"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="hover:text-blue-400"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="hover:text-red-500"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="hover:text-pink-500"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-xs">
+            <p>© 2026–2027 ТСН.ua. Усі права захищені. Використання матеріалів дозволяється за умови посилання на ТСН.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

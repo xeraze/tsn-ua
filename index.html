@@ -23,6 +23,8 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .prose p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; color: #374151; }
         .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-title:hover {text-decoration-line: underline;text-decoration-color: red;}
+
     </style>
     
 </head>
@@ -55,21 +57,24 @@ const DATABASE = {
             time: '13:00',
             cat: 'Херсон',
             type: 'article',
-            title: 'Окупанти обстріляли центр міста: є постраждалі',
-            img: 'https://picsum.photos/id/1011/1200/700',
+            title: 'Тестовий заголовок новини з Херсона',
+            img: 'https://img.tsn.ua/cached/323/tsn-0b4bc102/thumbs/1200x630/8c/5e/56696d155f95fdeaa910acc977945e8c.webp',
             fullText: [
-                'Окупанти обстріляли центр міста.',
-                'Є постраждалі серед цивільних.'
+                'це тестовий текст новини з Херсона.',
+                'Він використовується для демонстрації структури новинного матеріалу.',
+                'У реальних новинах тут буде детальний опис подій, цитати очевидців та експертів, а також аналіз ситуації.',
+                'Ця новина може містити інформацію про поточні події, військові дії, гуманітарну ситуацію та інші важливі аспекти життя в Херсоні під час війни.',
+                'Мета цієї новини — надати читачам повну картину того, що відбувається в регіоні, та допомогти їм краще розуміти контекст подій.'
             ]
         },
         {
             id: 2,
-            time: '11:20',
-            cat: 'Світ',
+            time: '19:18',
+            cat: 'Запис трансляції',
             type: 'video',
-            title: 'Відео моменту удару: зʼявилися нові кадри',
-            poster: 'https://picsum.photos/id/1015/1200/700',
-            videoSrc: 'https://www.w3schools.com/html/mov_bbb.mp4',
+            title: 'Відео запису трансляції з 25 лютого 2026 року',
+            poster: 'https://tsn.ua/static/og/uk/online.png',
+            videoSrc: 'https://files.fm/f/2ur35n98ch',
             fullText: [
                 'У мережі зʼявилися відеокадри удару.',
                 'Видно значні руйнування.'
@@ -77,16 +82,18 @@ const DATABASE = {
         },
         {
             id: 3,
-            time: '10:45',
-            cat: 'Економіка',
-            type: 'article',
-            title: 'Ціни на пальне знову поповзли вгору',
-            img: 'https://picsum.photos/id/1025/1200/700',
+            time: '16:00',
+            cat: 'Запис трансляції',
+            type: 'video',
+            title: 'Відео запису трансляції з 26 лютого 2026 року',
+            poster: 'https://tsn.ua/static/og/uk/online.png',
+            videoSrc: 'https://files.fm/f/5nxybnx3ar',
             fullText: [
-                'Ціни на пальне зростають.',
-                'Експерти прогнозують подальше підвищення.'
+                'У мережі зʼявилися відеокадри удару.',
+                'Видно значні руйнування.'
             ]
         }
+
     ]
 };
 
@@ -141,7 +148,13 @@ const HomePage = ({ onOpenArticle }) => (
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {DATABASE.news.map(item => (
+            {[...DATABASE.news]
+                .sort((a, b) => {
+                    const [aH, aM] = a.time.split(':').map(Number);
+                    const [bH, bM] = b.time.split(':').map(Number);
+                    return (bH * 60 + bM) - (aH * 60 + aM);
+                })
+                .map(item => (
                 <div
                     key={item.id}
                     onClick={() => onOpenArticle(item)}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
@@ -14,35 +14,61 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1a1a1a; margin: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
         .tsn-logo { font-weight: 1000; letter-spacing: -0.05em; }
-        .card-title:hover { text-decoration-line: underline; text-decoration-color: #e30613; }
+
+        .card-title:hover {
+            text-decoration-line: underline;
+            text-decoration-color: #e30613;
+        }
+
+        .animate-live { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
         .prose p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; color: #374151; }
-        .widget-slide { animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .widget-slide {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e30613; border-radius: 10px; }
-
-        :root { --plyr-color-main: #e30613; }
-        .plyr--full-ui input[type=range] { color: #e30613; }
-        .plyr__control--overlaid { background: rgba(227, 6, 19, 0.85); }
     </style>
 </head>
 <body>
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
-/* ================= DATABASE ================= */
 const DATABASE = {
     mainStory: {
         id: '3028130',
         category: 'Україна',
         type: 'article',
-        title: 'П’ятий рік повномасштабної війни: чи стане він останнім — два основних сценарії',
+        title: 'Пʼятий рік повномасштабної війни: чи стане він останнім — два основних сценарії',
+        desc: 'Військові експерти розібрали ключові фактори розвитку подій на фронті...',
         img: 'https://img.tsn.ua/cached/853/tsn-1284f5ef/thumbs/1920x600/b3/53/78727e29b1e58f5e120be37a52dd53b3.jpeg',
-        fullText: ["Війна в Україні триває вже п'ятий рік...", "Експерти аналізують 2026 рік як вирішальний."]
+        fullText: [
+            "Війна в Україні триває вже п'ятий рік. Ситуація на фронті залишається напруженою, але контрольованою.",
+            "Перший сценарій — війна на виснаження, де вирішальним фактором стане економічна стійкість сторін.",
+            "Другий — посилення дипломатичного тиску та отримання нових видів озброєння.",
+            "Експерти сходяться на думці, що 2025-2026 роки стануть вирішальними для завершення активної фази конфлікту."
+        ]
     },
     news: [
         {
@@ -52,7 +78,10 @@ const DATABASE = {
             type: 'article',
             title: 'Тестовий заголовок новини з Херсона: ситуація в місті',
             img: 'https://img.tsn.ua/cached/323/tsn-0b4bc102/thumbs/1200x630/8c/5e/56696d155f95fdeaa910acc977945e8c.webp',
-            fullText: ['Ситуація в місті залишається під пильною увагою.']
+            fullText: [
+                'Це тестовий текст новини з Херсона. Ситуація в місті залишається під пильною увагою.',
+                'У реальних новинах тут буде детальний опис подій, цитати очевидців та аналіз.'
+            ]
         },
         {
             id: 2,
@@ -62,7 +91,7 @@ const DATABASE = {
             title: 'Ексклюзив: Запис прямого ефіру від 25 лютого 2026 року',
             poster: 'https://tsn.ua/static/og/uk/online.png',
             videoSrc: 'Videos/2026-02-25 19-18-16.mkv',
-            fullText: ['Запис повної трансляції вечірнього випуску новин.']
+            fullText: ['Запис повної трансляції вечірнього випуску новин за вказану дату.']
         },
         {
             id: 3,
@@ -87,133 +116,247 @@ const DATABASE = {
     ]
 };
 
-/* ================= COMPONENTS ================= */
+const ALL_ITEMS = [DATABASE.mainStory, ...DATABASE.news];
+const CATEGORIES = ['Усі', ...Array.from(new Set(ALL_ITEMS.map((i) => i.category || i.cat)))];
+const buildArticlePath = (id) => `/news/${id}`;
+const findArticleById = (id) => ALL_ITEMS.find((item) => String(item.id) === String(id)) || null;
 
-const Icon = ({ name, size = 18, className = "" }) => {
-    const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className };
+const parsePath = (pathname) => {
+    if (!pathname || pathname === '/' || pathname.endsWith('/index.html') || pathname.endsWith('\\index.html')) {
+        return { page: 'home', data: null };
+    }
+    const match = pathname.match(/^\/news\/([^/]+)$/);
+    if (!match) return { page: 'not-found', data: null };
+    const article = findArticleById(match[1]);
+    return article ? { page: 'article', data: article } : { page: 'not-found', data: null };
+};
+
+const getCurrentPath = () => {
+    const hashPath = window.location.hash.replace(/^#/, '');
+    if (hashPath.startsWith('/')) return hashPath;
+    return window.location.pathname;
+};
+
+const navigateTo = (path) => {
+    if (window.location.pathname === path) return;
+    try {
+        window.history.pushState({}, '', path);
+    } catch (_) {
+        window.location.hash = `#${path}`;
+    }
+};
+
+const Icon = ({ name, size = 18, className = '', ...props }) => {
+    const common = {
+        width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+        stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', className
+    };
     const icons = {
         search: <svg {...common}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
         play: <svg {...common}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>,
-        sun: <svg {...common}><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line></svg>
+        home: <svg {...common}><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 10v10h14V10"></path></svg>,
+        'tv-2': <svg {...common}><rect x="2" y="7" width="20" height="15" rx="2"></rect><line x1="17" y1="2" x2="12" y2="7"></line><line x1="7" y1="2" x2="12" y2="7"></line></svg>,
+        bell: <svg {...common}><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M9 17a3 3 0 0 0 6 0"></path></svg>,
+        menu: <svg {...common}><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
+        sun: <svg {...common}><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line></svg>
     };
-    return <span>{icons[name]}</span>;
+    return <span {...props} aria-hidden="true">{icons[name] || null}</span>;
 };
 
 const VideoJSPlayer = ({ src, poster }) => {
     const videoRef = useRef(null);
+    const playerRef = useRef(null);
+    const [videoFailed, setVideoFailed] = useState(false);
+
     useEffect(() => {
-        const player = new window.Plyr(videoRef.current, {
-            controls: ["play-large", "play", "progress", "current-time", "mute", "volume", "settings", "fullscreen"]
-        });
-        return () => player.destroy();
-    }, [src]);
+        const v = videoRef.current;
+        if (!v || !window.Plyr || videoFailed) return;
+        if (playerRef.current) playerRef.current.destroy();
+        playerRef.current = new window.Plyr(v, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'] });
+        return () => {
+            if (playerRef.current) playerRef.current.destroy();
+            playerRef.current = null;
+        };
+    }, [src, videoFailed]);
+
+    if (videoFailed) {
+        return (
+            <div className="rounded-2xl overflow-hidden shadow-2xl mb-8 border-4 border-black bg-black text-white p-6">
+                <p className="font-bold mb-3">Не вдалося завантажити відео.</p>
+                <img src={poster} alt="Постер відео" className="w-full rounded-xl opacity-80" loading="lazy" />
+            </div>
+        );
+    }
+
     return (
         <div className="rounded-2xl overflow-hidden shadow-2xl mb-8 border-4 border-black bg-black">
-            <video ref={videoRef} playsInline poster={poster} className="w-full">
+            <video ref={videoRef} key={src} playsInline poster={poster} className="w-full h-auto bg-black" onError={() => setVideoFailed(true)}>
                 <source src={src} type="video/mp4" />
+                <source src={src} type="video/webm" />
+                <source src={src} type="video/x-matroska" />
             </video>
         </div>
     );
 };
 
-const Widgets = () => {
-    const [step, setStep] = useState(0);
-    const data = [
-        { label: 'USD', value: '41.20', trend: 'up' }, 
-        { label: 'EUR', value: '44.85', trend: 'down' }, 
-        { label: 'Херсон', value: '+12°C', icon: 'sun' }
-    ];
-    useEffect(() => {
-        const interval = setInterval(() => setStep(s => (s + 1) % data.length), 4000);
-        return () => clearInterval(interval);
-    }, []);
-    const item = data[step];
-    return (
-        <div className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full text-xs font-bold widget-slide min-w-[110px] justify-center">
-            {item.icon && <Icon name="sun" size={14} className="text-yellow-500" />}
-            <span>{item.label}: {item.value}</span>
-            {item.trend === 'up' && <span className="text-green-500 text-[10px]">▲</span>}
-            {item.trend === 'down' && <span className="text-red-500 text-[10px]">▼</span>}
+const FilterBar = ({ query, setQuery, category, setCategory, sortBy, setSortBy }) => (
+    <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Пошук по заголовках та тексту..." className="w-full lg:flex-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-red-600 focus:outline-none" aria-label="Пошук новин" />
+        <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((c) => (
+                <button key={c} onClick={() => setCategory(c)} className={`px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wide ${category === c ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>{c}</button>
+            ))}
         </div>
-    );
-};
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm" aria-label="Сортування новин">
+            <option value="time-desc">Спочатку новіші (за часом)</option>
+            <option value="time-asc">Спочатку старіші (за часом)</option>
+            <option value="title-asc">За назвою (А-Я)</option>
+            <option value="title-desc">За назвою (Я-А)</option>
+        </select>
+    </div>
+);
 
-const HomePage = ({ onOpenArticle }) => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-            <section className="group relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden cursor-pointer shadow-2xl" onClick={() => onOpenArticle(DATABASE.mainStory)}>
-                <img src={DATABASE.mainStory.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                <div className="absolute bottom-0 p-8">
-                    <span className="bg-red-600 text-white px-3 py-1 text-xs font-black uppercase mb-4 inline-block">Головне</span>
-                    <h1 className="text-white text-3xl md:text-5xl font-black leading-tight group-hover:underline decoration-red-600">{DATABASE.mainStory.title}</h1>
-                </div>
-            </section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {DATABASE.news.map(item => (
-                    <div key={item.id} onClick={() => onOpenArticle(item)} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group overflow-hidden">
-                        <div className="relative h-48">
-                            <img src={item.poster || item.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform"/>
-                            {item.type === 'video' && <div className="absolute inset-0 flex items-center justify-center"><div className="bg-red-600 rounded-full p-3"><Icon name="play" className="text-white fill-current" /></div></div>}
-                        </div>
-                        <div className="p-5">
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-[10px] font-black text-red-600 uppercase">{item.cat}</span>
-                                <span className="text-[10px] font-bold text-gray-400">{item.time}</span>
+const HomePage = ({ items, onOpenArticle, query, setQuery, category, setCategory, sortBy, setSortBy }) => (
+    <div className="space-y-6">
+        <FilterBar query={query} setQuery={setQuery} category={category} setCategory={setCategory} sortBy={sortBy} setSortBy={setSortBy} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+                <section className="group relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden cursor-pointer shadow-2xl" onClick={() => onOpenArticle(DATABASE.mainStory)}>
+                    <img src={DATABASE.mainStory.img} alt={DATABASE.mainStory.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                    <div className="absolute bottom-0 p-8">
+                        <span className="bg-red-600 text-white px-3 py-1 text-xs font-black uppercase mb-4 inline-block tracking-widest">Головне</span>
+                        <h1 className="text-white text-3xl md:text-5xl font-black leading-tight group-hover:underline decoration-red-600">{DATABASE.mainStory.title}</h1>
+                    </div>
+                </section>
+
+                {items.length === 0 ? (
+                    <div className="bg-white rounded-2xl p-8 text-center text-gray-500 font-bold">Нічого не знайдено за вашим запитом.</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {items.map((item) => (
+                            <div key={item.id} onClick={() => onOpenArticle(item)} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group">
+                                <div className="relative overflow-hidden rounded-t-2xl h-48">
+                                    <img src={item.poster || item.img || `https://picsum.photos/seed/${item.id}/600/400`} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy" />
+                                    {item.type === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/20"><div className="bg-red-600 rounded-full p-3 shadow-lg"><Icon name="play" className="text-white fill-current" /></div></div>}
+                                </div>
+                                <div className="p-5">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">{item.cat || item.category}</span>
+                                        <span className="text-[10px] font-bold text-gray-400">{item.time || 'Сьогодні'}</span>
+                                    </div>
+                                    <h3 className="card-title font-bold text-lg leading-snug">{item.title}</h3>
+                                </div>
                             </div>
-                            <h3 className="card-title font-bold text-lg">{item.title}</h3>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                )}
             </div>
-        </div>
-        <div className="bg-white rounded-3xl p-6 shadow-sm border-t-4 border-red-600 h-fit">
-            <h2 className="text-xl font-black mb-6 flex items-center"><span className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>Останні новини</h2>
-            <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                {DATABASE.news.map((item, idx) => (
-                    <div key={idx} className="border-b border-gray-100 pb-4 cursor-pointer hover:bg-gray-50" onClick={() => onOpenArticle(item)}>
-                        <div className="text-red-600 text-xs font-black">{item.time}</div>
-                        <p className="text-sm font-bold card-title">{item.title}</p>
+            <div className="space-y-6">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border-t-4 border-red-600">
+                    <h2 className="text-xl font-black mb-6 flex items-center"><span className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>Останні новини</h2>
+                    <div className="space-y-6 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                        {(items.length ? items : DATABASE.news).map((item) => (
+                            <div key={`side-${item.id}`} className="border-b border-gray-100 pb-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => onOpenArticle(item)}>
+                                <div className="text-red-600 text-xs font-black mb-1">{item.time || 'Сьогодні'}</div>
+                                <p className="text-sm font-bold leading-relaxed card-title">{item.title}</p>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     </div>
 );
 
-const ArticlePage = ({ article, onBack }) => (
-    <div className="max-w-4xl mx-auto py-10">
-        <button onClick={onBack} className="mb-6 text-red-600 font-black text-xs uppercase">← Назад</button>
-        <h1 className="text-3xl md:text-5xl font-black mb-8">{article.title}</h1>
-        {article.type === 'video' ? <VideoJSPlayer src={article.videoSrc} poster={article.poster}/> : <img src={article.img} className="w-full rounded-3xl mb-10 shadow-2xl"/>}
-        <div className="prose lg:prose-xl">{article.fullText?.map((p, i) => <p key={i}>{p}</p>)}</div>
-        <div className="mt-12 p-8 bg-gray-900 rounded-3xl text-white">
-            <h4 className="font-black text-xl mb-4">Підпишіться на ТСН.ua</h4>
-            <div className="flex space-x-4">
-                <a href="https://www.youtube.com/@tsn_ku" target="_blank" className="bg-red-600 px-6 py-2 rounded-full font-bold text-sm">YouTube</a>
-                <a href="https://discord.gg/fb4UfWkE2k" target="_blank" className="bg-purple-600 px-6 py-2 rounded-full font-bold text-sm">Discord</a>
-            </div>
+const ArticlePage = ({ article }) => (
+    <div className="max-w-4xl mx-auto py-6 md:py-10">
+        <div className="mb-6 flex items-center space-x-2 text-xs font-black uppercase text-gray-400 tracking-tighter">
+            <span className="text-red-600">{article.cat || article.category}</span>
+            <span>•</span>
+            <span>{article.time || 'Сьогодні'}</span>
+        </div>
+        <h1 className="text-3xl md:text-5xl font-black mb-8 leading-tight">{article.title}</h1>
+        {article.type === 'video' ? <VideoJSPlayer src={article.videoSrc} poster={article.poster} /> : <img src={article.img} alt={article.title} className="w-full rounded-3xl mb-10 shadow-2xl" loading="lazy" />}
+        <div className="prose lg:prose-xl max-w-none">
+            {article.fullText?.map((p, i) => <p key={i} className="text-gray-700 leading-relaxed">{p}</p>)}
+        </div>
+    </div>
+);
+
+const NotFoundPage = ({ onGoHome }) => (
+    <div className="max-w-3xl mx-auto py-20 text-center">
+        <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-200">
+            <h1 className="text-5xl font-black text-red-600 mb-4">404</h1>
+            <p className="text-xl font-bold mb-3">Сторінку не знайдено</p>
+            <p className="text-gray-500 mb-6">Можливо, новину видалено або посилання некоректне.</p>
+            <button onClick={onGoHome} className="bg-red-600 text-white px-6 py-3 rounded-xl font-black uppercase text-sm tracking-wider hover:bg-black transition-colors">На головну</button>
         </div>
     </div>
 );
 
 const App = () => {
-    const [view, setView] = useState({ page: 'home', data: null });
+    const [view, setView] = useState(() => parsePath(getCurrentPath()));
+    const [query, setQuery] = useState('');
+    const [category, setCategory] = useState('Усі');
+    const [sortBy, setSortBy] = useState('time-desc');
+
+    useEffect(() => {
+        const syncRoute = () => setView(parsePath(getCurrentPath()));
+        window.addEventListener('popstate', syncRoute);
+        window.addEventListener('hashchange', syncRoute);
+        return () => {
+            window.removeEventListener('popstate', syncRoute);
+            window.removeEventListener('hashchange', syncRoute);
+        };
+    }, []);
+
+    const filteredNews = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        let items = DATABASE.news.filter((item) => {
+            const itemCategory = item.cat || item.category || '';
+            if (category !== 'Усі' && itemCategory !== category) return false;
+            if (!q) return true;
+            const fullText = Array.isArray(item.fullText) ? item.fullText.join(' ').toLowerCase() : '';
+            return item.title.toLowerCase().includes(q) || fullText.includes(q);
+        });
+        items = [...items].sort((a, b) => {
+            if (sortBy === 'title-asc') return a.title.localeCompare(b.title, 'uk');
+            if (sortBy === 'title-desc') return b.title.localeCompare(a.title, 'uk');
+            const [ah='00', am='00'] = String(a.time || '00:00').split(':');
+            const [bh='00', bm='00'] = String(b.time || '00:00').split(':');
+            const aMinutes = Number(ah) * 60 + Number(am);
+            const bMinutes = Number(bh) * 60 + Number(bm);
+            return sortBy === 'time-asc' ? aMinutes - bMinutes : bMinutes - aMinutes;
+        });
+        return items;
+    }, [query, category, sortBy]);
+
+    const openArticle = (article) => {
+        navigateTo(buildArticlePath(article.id));
+        setView({ page: 'article', data: article });
+    };
+
+    const goHome = () => {
+        navigateTo('/');
+        setView({ page: 'home', data: null });
+    };
+
     return (
         <div className="min-h-screen pb-20">
             <header className="bg-white border-b-4 border-red-600 sticky top-0 z-50 shadow-md">
-                <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
-                    <div className="text-3xl md:text-5xl font-black cursor-pointer tsn-logo" onClick={() => setView({ page: 'home' })}>
-                        ТСН<span className="text-red-600">.</span>UA
-                    </div>
-                    <div className="flex items-center space-x-4">
-                        <Widgets />
-                        <button className="bg-red-600 text-white p-2 rounded-lg hover:bg-black"><Icon name="search" size={20} /></button>
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
+                    <div className="text-3xl md:text-5xl font-black cursor-pointer tsn-logo" onClick={goHome}>ТСН<span className="text-red-600">.</span>UA</div>
+                    <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2 w-[260px]">
+                        <Icon name="search" size={16} className="text-gray-500 mr-2" />
+                        <input value={query} onChange={(e) => { setQuery(e.target.value); if (view.page !== 'home') goHome(); }} placeholder="Пошук новин" className="bg-transparent text-sm w-full outline-none" aria-label="Пошук у шапці" />
                     </div>
                 </div>
             </header>
             <main className="max-w-7xl mx-auto p-4 md:p-6 mt-4">
-                {view.page === 'home' ? <HomePage onOpenArticle={(data) => setView({ page: 'article', data })} /> : <ArticlePage article={view.data} onBack={() => setView({ page: 'home' })} />}
+                {view.page === 'home' && <HomePage items={filteredNews} onOpenArticle={openArticle} query={query} setQuery={setQuery} category={category} setCategory={setCategory} sortBy={sortBy} setSortBy={setSortBy} />}
+                {view.page === 'article' && view.data && <ArticlePage article={view.data} />}
+                {view.page === 'not-found' && <NotFoundPage onGoHome={goHome} />}
             </main>
         </div>
     );

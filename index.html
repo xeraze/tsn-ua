@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ТСН.ua — Новини України та світу</title>
 
+    <!-- Scripts -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,18 +16,42 @@
     <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
 
-  <style>
+    <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1a1a1a; margin: 0; }
-        .tsn-logo { font-weight: 1000; letter-spacing: -0.05em; }
-        .animate-live { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .prose p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; color: #374151; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-title:hover {text-decoration-line: underline;text-decoration-color: red;}
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f3f4f6; 
+            color: #1a1a1a; 
+            margin: 0; 
+        }
 
+        .tsn-logo { font-weight: 1000; letter-spacing: -0.05em; }
+        
+        .card-title:hover {
+            text-decoration-line: underline;
+            text-decoration-color: #e30613;
+        }
+
+        .animate-live { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 
+            0%, 100% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.5; transform: scale(1.1); } 
+        }
+
+        .prose p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; color: #374151; }
+        
+        .widget-slide {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e30613; border-radius: 10px; }
     </style>
-    
 </head>
 <body>
 <div id="root"></div>
@@ -41,30 +66,26 @@ const DATABASE = {
         category: 'Україна',
         type: 'article',
         title: 'П’ятий рік повномасштабної війни: чи стане він останнім — два основних сценарії',
-        desc: 'Військові експерти розібрали ключові фактори...',
+        desc: 'Військові експерти розібрали ключові фактори розвитку подій на фронті...',
         img: 'https://img.tsn.ua/cached/853/tsn-1284f5ef/thumbs/1920x600/b3/53/78727e29b1e58f5e120be37a52dd53b3.jpeg',
         fullText: [
-            "Війна в Україні триває вже п'ятий рік.",
-            "Перший сценарій — війна на виснаження.",
-            "Другий — дипломатичний тиск.",
-            "2025 рік стане вирішальним."
+            "Війна в Україні триває вже п'ятий рік. Ситуація на фронті залишається напруженою, але контрольованою.",
+            "Перший сценарій — війна на виснаження, де вирішальним фактором стане економічна стійкість сторін.",
+            "Другий — посилення дипломатичного тиску та отримання нових видів озброєння.",
+            "Експерти сходяться на думці, що 2025-2026 роки стануть вирішальними для завершення активної фази конфлікту."
         ]
     },
-
     news: [
         {
             id: 1,
             time: '13:00',
             cat: 'Херсон',
             type: 'article',
-            title: 'Тестовий заголовок новини з Херсона',
+            title: 'Тестовий заголовок новини з Херсона: ситуація в місті',
             img: 'https://img.tsn.ua/cached/323/tsn-0b4bc102/thumbs/1200x630/8c/5e/56696d155f95fdeaa910acc977945e8c.webp',
             fullText: [
-                'це тестовий текст новини з Херсона.',
-                'Він використовується для демонстрації структури новинного матеріалу.',
-                'У реальних новинах тут буде детальний опис подій, цитати очевидців та експертів, а також аналіз ситуації.',
-                'Ця новина може містити інформацію про поточні події, військові дії, гуманітарну ситуацію та інші важливі аспекти життя в Херсоні під час війни.',
-                'Мета цієї новини — надати читачам повну картину того, що відбувається в регіоні, та допомогти їм краще розуміти контекст подій.'
+                'Це тестовий текст новини з Херсона. Ситуація в місті залишається під пильною увагою.',
+                'У реальних новинах тут буде детальний опис подій, цитати очевидців та аналіз.'
             ]
         },
         {
@@ -72,47 +93,41 @@ const DATABASE = {
             time: '19:18',
             cat: 'Запис трансляції',
             type: 'video',
-            title: 'Відео запису трансляції з 25 лютого 2026 року',
+            title: 'Ексклюзив: Запис прямого ефіру від 25 лютого 2026 року',
             poster: 'https://tsn.ua/static/og/uk/online.png',
             videoSrc: 'Videos/2026-02-25 19-18-16.mkv',
-            fullText: [
-                'Запис трансляції з 25 лютого 2026 року.'
-            ]
+            fullText: ['Запис повної трансляції вечірнього випуску новин за вказану дату.']
         },
         {
             id: 3,
             time: '16:00',
             cat: 'Запис трансляції',
             type: 'video',
-            title: 'Відео запису трансляції з 26 лютого 2026 року',
+            title: 'Випуск новин: Події 26 лютого 2026 року',
             poster: 'https://tsn.ua/static/og/uk/online.png',
             videoSrc: 'Videos/2026-02-26 16-00-35.mp4',
-            fullText: [
-                'Запис трансляції з 26 лютого 2026 року.'
-            ]
+            fullText: ['Архівний запис денного випуску новин.']
         },
         {
             id: 4,
             time: '16:00',
             cat: 'Запис трансляції',
             type: 'video',
-            title: 'Відео запису трансляції з 27 лютого 2026 року',
+            title: 'Спеціальний репортаж від 27 лютого 2026 року',
             poster: 'https://tsn.ua/static/og/uk/online.png',
             videoSrc: 'Videos/2026-02-27 16-00-02.mp4',
-            fullText: [
-                'Запис трансляції з 27 лютого 2026 року.'
-            ]
+            fullText: ['Актуальні події за сьогодні у повному відео форматі.']
         }
-
     ]
 };
 
-/* ================= ICON ================= */
-const Icon = ({ name, size = 18, className = "" }) => (
-    <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>
-);
+/* ================= COMPONENTS ================= */
 
-/* ================= VIDEO PLAYER ================= */
+const Icon = ({ name, size = 18, className = "" }) => {
+    useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
+    return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+};
+
 const VideoJSPlayer = ({ src, poster }) => {
     const videoRef = useRef(null);
     const playerRef = useRef(null);
@@ -122,114 +137,228 @@ const VideoJSPlayer = ({ src, poster }) => {
             playerRef.current = videojs(videoRef.current, {
                 controls: true,
                 fluid: true,
-                preload: 'auto',
+                playbackRates: [0.5, 1, 1.5, 2],
                 poster
             });
         }
-        return () => {
-            if (playerRef.current) {
-                playerRef.current.dispose();
-                playerRef.current = null;
-            }
-        };
+        return () => { if (playerRef.current) { playerRef.current.dispose(); playerRef.current = null; } };
     }, []);
 
     return (
-        <div className="rounded-[2.5rem] overflow-hidden shadow-xl mb-12">
+        <div className="rounded-2xl overflow-hidden shadow-2xl mb-8 border-4 border-black bg-black">
             <video ref={videoRef} className="video-js vjs-big-play-centered">
                 <source src={src} type="video/mp4" />
+                <source src={src} type="video/x-matroska" />
             </video>
         </div>
     );
 };
 
-/* ================= HOME ================= */
+const Widgets = () => {
+    const [step, setStep] = useState(0);
+    const data = [
+        { label: 'USD', value: '41.20', trend: 'up' },
+        { label: 'EUR', value: '44.85', trend: 'down' },
+        { label: 'Київ', value: '+14°C', icon: 'sun' }
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => setStep(s => (s + 1) % data.length), 4000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const item = data[step];
+
+    return (
+        <div className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full text-xs font-bold widget-slide min-w-[100px] justify-center">
+            {item.icon ? <Icon name={item.icon} size={14} className="text-yellow-500" /> : null}
+            <span>{item.label}: {item.value}</span>
+            {item.trend === 'up' && <span className="text-green-500">▲</span>}
+            {item.trend === 'down' && <span className="text-red-500">▼</span>}
+        </div>
+    );
+};
+
 const HomePage = ({ onOpenArticle }) => (
-    <div className="space-y-12">
-
-        <section
-            className="relative h-[450px] rounded-[2.5rem] overflow-hidden cursor-pointer"
-            onClick={() => onOpenArticle(DATABASE.mainStory)}
-        >
-            <img src={DATABASE.mainStory.img} className="absolute inset-0 w-full h-full object-cover"/>
-            <div className="absolute inset-0 bg-gradient-to-t from-black p-10 flex flex-col justify-end">
-                <h1 className="text-white text-4xl font-black">{DATABASE.mainStory.title}</h1>
-            </div>
-        </section>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[...DATABASE.news]
-                .sort((a, b) => {
-                    const [aH, aM] = a.time.split(':').map(Number);
-                    const [bH, bM] = b.time.split(':').map(Number);
-                    return (bH * 60 + bM) - (aH * 60 + aM);
-                })
-                .map(item => (
-                <div
-                    key={item.id}
-                    onClick={() => onOpenArticle(item)}
-                    className="bg-white rounded-3xl shadow hover:shadow-xl cursor-pointer"
-                >
-                    <img
-                        src={item.poster || item.img || `https://picsum.photos/seed/${item.id}/600/400`}
-                        className="rounded-t-3xl w-full h-56 object-cover"
-                    />
-                    <div className="p-5">
-                        <div className="flex justify-between text-xs font-bold mb-2">
-                            <span className="text-red-600">{item.cat}</span>
-                            <span className="text-gray-400">{item.time}</span>
-                        </div>
-                        <h3 className="font-bold text-lg">{item.title}</h3>
-                    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Main Column */}
+        <div className="lg:col-span-2 space-y-8">
+            <section 
+                className="group relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden cursor-pointer shadow-2xl"
+                onClick={() => onOpenArticle(DATABASE.mainStory)}
+            >
+                <img src={DATABASE.mainStory.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div className="absolute bottom-0 p-8">
+                    <span className="bg-red-600 text-white px-3 py-1 text-xs font-black uppercase mb-4 inline-block tracking-widest">Головне</span>
+                    <h1 className="text-white text-3xl md:text-5xl font-black leading-tight group-hover:underline decoration-red-600">{DATABASE.mainStory.title}</h1>
                 </div>
-            ))}
+            </section>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {DATABASE.news.map(item => (
+                    <div 
+                        key={item.id} 
+                        onClick={() => onOpenArticle(item)}
+                        className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                    >
+                        <div className="relative overflow-hidden rounded-t-2xl h-48">
+                            <img 
+                                src={item.poster || item.img || `https://picsum.photos/seed/${item.id}/600/400`} 
+                                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                            />
+                            {item.type === 'video' && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <div className="bg-red-600 rounded-full p-3 shadow-lg">
+                                        <Icon name="play" className="text-white fill-current" />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="p-5">
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">{item.cat}</span>
+                                <span className="text-[10px] font-bold text-gray-400">{item.time}</span>
+                            </div>
+                            <h3 className="card-title font-bold text-lg leading-snug">{item.title}</h3>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Sidebar News Feed */}
+        <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-t-4 border-red-600">
+                <h2 className="text-xl font-black mb-6 flex items-center">
+                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>
+                    Останні новини
+                </h2>
+                <div className="space-y-6 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                    {DATABASE.news.concat(DATABASE.news).map((item, idx) => (
+                        <div key={idx} className="border-b border-gray-100 pb-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => onOpenArticle(item)}>
+                            <div className="text-red-600 text-xs font-black mb-1">{item.time}</div>
+                            <p className="text-sm font-bold leading-relaxed card-title">{item.title}</p>
+                        </div>
+                    ))}
+                </div>
+                <button className="w-full mt-6 py-3 bg-gray-100 text-xs font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-colors rounded-xl">
+                    Більше новин
+                </button>
+            </div>
         </div>
     </div>
 );
 
-/* ================= ARTICLE ================= */
 const ArticlePage = ({ article }) => (
-    <div className="max-w-4xl mx-auto py-10">
-        <h1 className="text-5xl font-black mb-8">{article.title}</h1>
+    <div className="max-w-4xl mx-auto py-6 md:py-10 animate-slide-up">
+        <div className="mb-6 flex items-center space-x-2 text-xs font-black uppercase text-gray-400 tracking-tighter">
+            <span className="text-red-600">{article.cat || article.category}</span>
+            <span>•</span>
+            <span>{article.time || 'Сьогодні'}</span>
+        </div>
+        
+        <h1 className="text-3xl md:text-5xl font-black mb-8 leading-tight">{article.title}</h1>
 
         {article.type === 'video' ? (
             <VideoJSPlayer src={article.videoSrc} poster={article.poster}/>
         ) : (
-            <img src={article.img} className="rounded-[2.5rem] mb-12 shadow-xl"/>
+            <img src={article.img} className="w-full rounded-3xl mb-10 shadow-2xl"/>
         )}
 
-        <div className="prose">
-            {article.fullText?.map((p,i)=><p key={i}>{p}</p>)}
+        <div className="prose lg:prose-xl max-w-none">
+            {article.fullText?.map((p, i) => (
+                <p key={i} className="text-gray-700 leading-relaxed">{p}</p>
+            ))}
+        </div>
+
+        <div className="mt-12 p-8 bg-gray-900 rounded-3xl text-white">
+            <h4 className="font-black text-xl mb-4 uppercase tracking-widest">Підпишіться на ТСН.ua</h4>
+            <p className="text-gray-400 mb-6">Будьте в курсі найважливіших подій України та світу.</p>
+            <div className="flex space-x-4">
+                <button className="bg-red-600 px-6 py-2 rounded-full font-bold text-sm">Telegram</button>
+                <button className="bg-blue-600 px-6 py-2 rounded-full font-bold text-sm">Facebook</button>
+            </div>
         </div>
     </div>
 );
 
-/* ================= APP ================= */
+/* ================= MAIN APP ================= */
 const App = () => {
-    const [view, setView] = useState({ page:'home', data:null });
+    const [view, setView] = useState({ page: 'home', data: null });
 
     useEffect(() => {
         if (window.lucide) window.lucide.createIcons();
+        window.scrollTo(0, 0);
     }, [view]);
 
     return (
-        <>
-            <header className="bg-white border-b-8 border-red-600 p-4 font-black cursor-pointer"
-                onClick={()=>setView({page:'home',data:null})}>
-                ТСН<span className="text-red-600">.</span>UA
+        <div className="min-h-screen pb-20">
+            {/* Upper Header (Desktop) */}
+            <div className="hidden md:block bg-gray-900 text-[10px] py-1 text-gray-400 font-bold">
+                <div className="max-w-7xl mx-auto px-6 flex justify-between uppercase tracking-widest">
+                    <div className="flex space-x-4">
+                        <a href="#" className="hover:text-white">Контакти</a>
+                        <a href="#" className="hover:text-white">Реклама</a>
+                        <a href="#" className="hover:text-white">Спецпроєкти</a>
+                    </div>
+                    <div className="flex items-center text-red-500 font-black">
+                        <span className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2 animate-pulse"></span>
+                        Прямий ефір: ТСН 19:30
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Header */}
+            <header className="bg-white border-b-4 border-red-600 sticky top-0 z-50 shadow-md">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+                    <div className="flex items-center space-x-8">
+                        <div 
+                            className="text-3xl md:text-5xl font-black cursor-pointer tsn-logo"
+                            onClick={() => setView({ page: 'home', data: null })}
+                        >
+                            ТСН<span className="text-red-600">.</span>UA
+                        </div>
+                        <nav className="hidden xl:flex space-x-6 text-[13px] font-black uppercase tracking-tighter">
+                            <a href="#" className="hover:text-red-600 transition-colors">Війна</a>
+                            <a href="#" className="text-red-600 border-b-2 border-red-600">Новини</a>
+                            <a href="#" className="hover:text-red-600">Політика</a>
+                            <a href="#" className="hover:text-red-600">Економіка</a>
+                            <a href="#" className="hover:text-red-600">Світ</a>
+                        </nav>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                        <Widgets />
+                        <button className="bg-red-600 text-white p-2 rounded-lg hover:bg-black transition-colors">
+                            <Icon name="search" size={20} />
+                        </button>
+                    </div>
+                </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-6">
+            {/* Content Area */}
+            <main className="max-w-7xl mx-auto p-4 md:p-6 mt-4">
                 {view.page === 'home'
-                    ? <HomePage onOpenArticle={(data)=>setView({page:'article',data})}/>
-                    : <ArticlePage article={view.data}/>
+                    ? <HomePage onOpenArticle={(data) => setView({ page: 'article', data })} />
+                    : <ArticlePage article={view.data} />
                 }
             </main>
-        </>
+
+            {/* Mobile Nav Overlay (Optional) */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-around md:hidden shadow-2xl z-50">
+                <Icon name="home" className="text-red-600" onClick={() => setView({ page: 'home', data: null })} />
+                <Icon name="tv-2" className="text-gray-400" />
+                <Icon name="bell" className="text-gray-400" />
+                <Icon name="menu" className="text-gray-400" />
+            </div>
+        </div>
     );
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
 </script>
 </body>
 </html>

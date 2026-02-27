@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -52,7 +54,7 @@
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 /* ================= DATABASE ================= */
 const DATABASE = {
@@ -188,9 +190,44 @@ const Icon = ({ name, size = 18, className = "", ...props }) => {
 };
 
 const VideoJSPlayer = ({ src, poster }) => {
+    const videoRef = useRef(null);
+    const playerRef = useRef(null);
+
+    useEffect(() => {
+        const v = videoRef.current;
+        if (!v || !window.Plyr) return;
+
+        if (playerRef.current) {
+            playerRef.current.destroy();
+            playerRef.current = null;
+        }
+
+        playerRef.current = new window.Plyr(v, {
+            controls: [
+                "play-large",
+                "play",
+                "progress",
+                "current-time",
+                "mute",
+                "volume",
+                "settings",
+                "fullscreen"
+            ],
+            settings: ["speed", "quality"],
+            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
+        });
+
+        return () => {
+            if (playerRef.current) {
+                playerRef.current.destroy();
+                playerRef.current = null;
+            }
+        };
+    }, [src]);
+
     return (
         <div className="rounded-2xl overflow-hidden shadow-2xl mb-8 border-4 border-black bg-black">
-            <video key={src} controls playsInline poster={poster} className="w-full h-auto">
+            <video ref={videoRef} key={src} playsInline poster={poster} className="w-full h-auto bg-black">
                 <source src={src} type="video/mp4" />
                 <source src={src} type="video/webm" />
                 <source src={src} type="video/x-matroska" />

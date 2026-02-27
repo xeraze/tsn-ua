@@ -47,6 +47,10 @@
 
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e30613; border-radius: 10px; }
+
+        .plyr {
+            --plyr-color-main: #e30613;
+        }
     </style>
 </head>
 <body>
@@ -118,33 +122,6 @@ const DATABASE = {
 
 const ALL_ITEMS = [DATABASE.mainStory, ...DATABASE.news];
 const CATEGORIES = ['Усі', ...Array.from(new Set(ALL_ITEMS.map((i) => i.category || i.cat)))];
-const buildArticlePath = (id) => `/news/${id}`;
-const findArticleById = (id) => ALL_ITEMS.find((item) => String(item.id) === String(id)) || null;
-
-const parsePath = (pathname) => {
-    if (!pathname || pathname === '/' || pathname.endsWith('/index.html') || pathname.endsWith('\\index.html')) {
-        return { page: 'home', data: null };
-    }
-    const match = pathname.match(/^\/news\/([^/]+)$/);
-    if (!match) return { page: 'not-found', data: null };
-    const article = findArticleById(match[1]);
-    return article ? { page: 'article', data: article } : { page: 'not-found', data: null };
-};
-
-const getCurrentPath = () => {
-    const hashPath = window.location.hash.replace(/^#/, '');
-    if (hashPath.startsWith('/')) return hashPath;
-    return window.location.pathname;
-};
-
-const navigateTo = (path) => {
-    if (window.location.pathname === path) return;
-    try {
-        window.history.pushState({}, '', path);
-    } catch (_) {
-        window.location.hash = `#${path}`;
-    }
-};
 
 const Icon = ({ name, size = 18, className = '', ...props }) => {
     const common = {
@@ -284,32 +261,11 @@ const ArticlePage = ({ article }) => (
     </div>
 );
 
-const NotFoundPage = ({ onGoHome }) => (
-    <div className="max-w-3xl mx-auto py-20 text-center">
-        <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-200">
-            <h1 className="text-5xl font-black text-red-600 mb-4">404</h1>
-            <p className="text-xl font-bold mb-3">Сторінку не знайдено</p>
-            <p className="text-gray-500 mb-6">Можливо, новину видалено або посилання некоректне.</p>
-            <button onClick={onGoHome} className="bg-red-600 text-white px-6 py-3 rounded-xl font-black uppercase text-sm tracking-wider hover:bg-black transition-colors">На головну</button>
-        </div>
-    </div>
-);
-
 const App = () => {
-    const [view, setView] = useState(() => parsePath(getCurrentPath()));
+    const [view, setView] = useState({ page: 'home', data: null });
     const [query, setQuery] = useState('');
     const [category, setCategory] = useState('Усі');
     const [sortBy, setSortBy] = useState('time-desc');
-
-    useEffect(() => {
-        const syncRoute = () => setView(parsePath(getCurrentPath()));
-        window.addEventListener('popstate', syncRoute);
-        window.addEventListener('hashchange', syncRoute);
-        return () => {
-            window.removeEventListener('popstate', syncRoute);
-            window.removeEventListener('hashchange', syncRoute);
-        };
-    }, []);
 
     const filteredNews = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -333,12 +289,10 @@ const App = () => {
     }, [query, category, sortBy]);
 
     const openArticle = (article) => {
-        navigateTo(buildArticlePath(article.id));
         setView({ page: 'article', data: article });
     };
 
     const goHome = () => {
-        navigateTo('/');
         setView({ page: 'home', data: null });
     };
 
@@ -356,7 +310,6 @@ const App = () => {
             <main className="max-w-7xl mx-auto p-4 md:p-6 mt-4">
                 {view.page === 'home' && <HomePage items={filteredNews} onOpenArticle={openArticle} query={query} setQuery={setQuery} category={category} setCategory={setCategory} sortBy={sortBy} setSortBy={setSortBy} />}
                 {view.page === 'article' && view.data && <ArticlePage article={view.data} />}
-                {view.page === 'not-found' && <NotFoundPage onGoHome={goHome} />}
             </main>
         </div>
     );
